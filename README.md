@@ -111,7 +111,7 @@ Copy the ceph key to the `ceph-mon02`, `ceph-mon03`, `ceph-node01`, `ceph-node02
 <br>
 [root@ceph-mon01 ~]# cephadm shell ceph cephadm get-pub-key > ~/ceph.pub
 <br>
-[root@ceph-mon01 ~]# for node in ceph-mon0{2,3} ceph-node0{1,2,3}; do cat ~/ceph.pub | ssh cloud-user@${node} "tee -a ~/.ssh/authorized_keys"; ssh ${node} --  "sudo podman login -u='15324659|ceph5playground' -p=REDACTED registry.redhat.io"; done
+[root@ceph-mon01 ~]# for node in ceph-mon0{2,3} ceph-node0{1,2,3}; do cat ~/ceph.pub | ssh cloud-user@${node} "tee -a ~/.ssh/authorized_keys"; ssh ${node} --  "sudo podman login -u='15324659|username' -p='your_password_here' registry.redhat.io"; done
 </pre>
 </em>
 
