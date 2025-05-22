@@ -46,7 +46,7 @@ Run `podman login` as shown below:
 
 <em>
 <pre>
-[root@ceph-mon01 ~]# podman login -u='15324659|ceph5playground' -p=REDACTED registry.redhat.io
+[root@ceph-mon01 ~]# podman login -u='15324659|username' -p='your_password_here' registry.redhat.io
 </pre>
 </em>
 
