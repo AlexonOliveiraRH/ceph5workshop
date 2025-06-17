@@ -42,11 +42,15 @@ Install the `cephadm` utility:
 
 Navigate to [Registry Service Accounts](https://access.redhat.com/terms-based-registry/#/accounts) to create a service account and obtain the pull screen.
 
+Click on the `New Service Account`button. In the `Name` field, the first 8 characters are automatically provided to you as seven integers and a pipeline (e.g. `1234567|`). You need to fill the box with your preffered name. The full name should something like `1234567|username`. This is going to be your user. After creating it, search for your user typing its name in the search bar.
+
+The password is generated automatically after the creation of the user and it is going to be shown as a token. Use the full username as created before as your user and the token as your password for the next command.
+
 Run `podman login` as shown below:
 
 <em>
 <pre>
-[root@ceph-mon01 ~]# podman login -u='15324659|username' -p='your_password_here' registry.redhat.io
+[root@ceph-mon01 ~]# podman login -u='1234567|username' -p='your_token_here' registry.redhat.io
 </pre>
 </em>
 
@@ -111,7 +115,7 @@ Copy the ceph key to the `ceph-mon02`, `ceph-mon03`, `ceph-node01`, `ceph-node02
 <br>
 [root@ceph-mon01 ~]# cephadm shell ceph cephadm get-pub-key > ~/ceph.pub
 <br>
-[root@ceph-mon01 ~]# for node in ceph-mon0{2,3} ceph-node0{1,2,3}; do cat ~/ceph.pub | ssh cloud-user@${node} "tee -a ~/.ssh/authorized_keys"; ssh ${node} --  "sudo podman login -u='15324659|username' -p='your_password_here' registry.redhat.io"; done
+[root@ceph-mon01 ~]# for node in ceph-mon0{2,3} ceph-node0{1,2,3}; do cat ~/ceph.pub | ssh cloud-user@${node} "tee -a ~/.ssh/authorized_keys"; ssh ${node} --  "sudo podman login -u='1234567|username' -p='your_token_here' registry.redhat.io"; done
 </pre>
 </em>
 
@@ -289,7 +293,7 @@ rbd image 'test':
 </pre>
 </em>
 
-Disconnect from `ceph-mon01` and go back to workstation. Then map the RBD volume, format it with a filesystem, mount it, test it, then delete everything:
+Disconnect from `ceph-mon01` (_Note: You will to run only one command inside this host_) and go back to workstation. Then map the RBD volume, format it with a filesystem, mount it, test it, then delete everything:
 
 <em>
 <pre>
@@ -332,7 +336,7 @@ Filesystem     Type  Size  Used Avail Use% Mounted on
 <br>
 [root@workstation ~]# rbd showmapped
 <br>
-[root@workstation ~]# rbd rm rbd/test
+[root@ceph-mon01 ~]# rbd rm rbd/test
 Removing image: 100% complete...done.
 <br>
 [root@workstation ~]# rbd -p rbd ls
@@ -665,6 +669,20 @@ make_bucket: testbucket
         "has_bucket_info": "false"
     }
 }
+</pre>
+</em>
+
+Now create a file and upload it to the newly created bucket:
+
+<em>
+<pre>
+[root@workstation ~]# echo "Ceph 5 Workshop RGW Testing File" > myfile.txt
+<br>
+[root@workstation ~]# aws --profile=ceph --endpoint-url=http://ceph-mon02.example.com s3 cp ./myfile.txt s3://testbucket/myfile.txt
+upload: ./myfile.txt to s3://testbucket/myfile.txt
+<br>
+[root@workstation ~]# aws --profile=ceph --endpoint-url=http://ceph-mon02.example.com s3 ls s3://testbucket
+2025-05-13 14:41:55         33 myfile.txt
 <br>
 [root@workstation ~]# radosgw-admin bucket list --bucket=testbucket
 [
@@ -696,20 +714,6 @@ make_bucket: testbucket
         "versioned_epoch": 0
     }
 ]
-</pre>
-</em>
-
-Now create a file and upload it to the newly created bucket:
-
-<em>
-<pre>
-[root@workstation ~]# echo "Ceph 5 Workshop RGW Testing File" > myfile.txt
-<br>
-[root@workstation ~]# aws --profile=ceph --endpoint-url=http://ceph-mon02.example.com s3 cp ./myfile.txt s3://testbucket/myfile.txt
-upload: ./myfile.txt to s3://testbucket/myfile.txt
-<br>
-[root@workstation ~]# aws --profile=ceph --endpoint-url=http://ceph-mon02.example.com s3 ls s3://testbucket
-2025-05-13 14:41:55         33 myfile.txt
 </pre>
 </em>
 
